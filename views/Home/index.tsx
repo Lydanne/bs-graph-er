@@ -146,16 +146,7 @@ function trans(tables = []) {
             target: id,
           };
           if (nodes[0].id === edge.target) {
-            if (!isLoop) {
-              nodes.push({
-                id: "root-ref",
-                type: "output",
-                position: { x: 0, y: 0 },
-                data: { label: `Ref<${nodes[0].data.label}>` },
-                targetPosition: "left",
-              });
-              isLoop = true;
-            }
+            isLoop = true;
             edges.push({
               id: "root-ref-edge" + edge.id,
               sourceHandle: edge.sourceHandle,
@@ -168,6 +159,16 @@ function trans(tables = []) {
         }
       }
     }
+  }
+
+  if (isLoop) {
+    nodes.push({
+      id: "root-ref",
+      type: "output",
+      position: { x: 0, y: 0 },
+      data: { label: `Ref<${nodes[0].data.label}>` },
+      targetPosition: "left",
+    });
   }
 
   return [nodes, edges];
