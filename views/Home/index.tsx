@@ -6,6 +6,51 @@ import { Node, ReactFlowProvider } from "reactflow";
 import { LayoutFlow } from "@/components/LayoutFlow";
 import { trans } from "./trans";
 
+import { ITable, bitable } from "@lark-base-open/js-sdk";
+const bs: { table?: ITable } = {};
+let pr: any;
+const p = new Promise((resolve) => (pr = resolve));
+setTimeout(async () => {
+  // const table = await bitable.base.getActiveTable();
+  // bs.table = table;
+  // const fieldList = await table.getFieldList();
+  const tableList = await bitable.base.getTableList();
+  pr(await bsTableTrans(tableList));
+  // console.log({ tableList }, ;
+  // bitable.base.onSelectionChange((e) => {
+  //   console.log(e);
+  // });
+});
+
+async function bsTableTrans(bsTableList: ITable[]) {
+  const tables = [];
+
+  for (let i = 0; i < bsTableList.length; i++) {
+    const bsTable = bsTableList[i];
+    const name = await bsTable.getName();
+    const fields = await bsTable
+      .getFieldList()
+      .then((list) => Promise.all(list.map((item) => item.getMeta())));
+    const primary = fields.find((item) => item.isPrimary);
+    tables.push({
+      id: bsTable.id,
+      label: name,
+      primary: primary?.id,
+      meta: bsTable,
+      fields: fields.map((item) => ({
+        id: item.id,
+        label: item.name,
+        type: item.type,
+        property: item.property,
+        meta: item,
+      })),
+      data: [],
+    });
+  }
+
+  return tables;
+}
+
 const tables = [
   {
     id: "1",
@@ -107,69 +152,32 @@ const tables = [
     ],
   },
 ];
-
-const [initialNodes, initialEdges] = trans(tables);
-
-console.log({ initialNodes, initialEdges });
-
-// const initialNodes = [
-//   {
-//     id: "1",
-//     type: "kvlist",
-//     position: { x: 0, y: 0 },
-//     data: {
-//       name: "table1",
-//       data: [
-//         {
-//           id: "field1",
-//           label: "field1",
-//           value: "1",
-//         },
-//       ],
-//     },
-//     sourcePosition: "right",
-//     targetPosition: "left",
-//   },
-//   {
-//     id: "2",
-//     type: "kvlist",
-//     position: { x: 0, y: 0 },
-//     data: { label: "" },
-//     sourcePosition: "right",
-//     targetPosition: "left",
-//   },
-//   {
-//     id: "3",
-//     type: "kvlist",
-//     position: { x: 0, y: 0 },
-//     data: { label: "2" },
-//     sourcePosition: "right",
-//     targetPosition: "left",
-//   },
-//   {
-//     id: "4",
-//     type: "kvlist",
-//     position: { x: 0, y: 0 },
-//     data: { label: "2" },
-//     sourcePosition: "right",
-//     targetPosition: "left",
-//   },
-// ];
-// const initialEdges = [
-//   { id: "e1-2", source: "1", target: "2" },
-//   { id: "e1-3", source: "1", target: "3" },
-//   { id: "e1-4", source: "3", target: "4" },
-// ];
-
+let t = false;
 export default function Home() {
+  const [graph, setGraph] = useState<any>({});
+  useEffect(() => {
+    if (t) return;
+    t = true;
+    p.then((tables) => {
+      console.log({ tables });
+
+      const [initialNodes, initialEdges] = trans(tables);
+      console.log({ initialNodes, initialEdges });
+      setGraph({ initialNodes, initialEdges });
+    });
+  });
   return (
     <main className={styles.main} style={{ width: "100vw", height: "100vh" }}>
-      <ReactFlowProvider>
-        <LayoutFlow
-          initialEdges={initialEdges as any}
-          initialNodes={initialNodes as any}
-        />
-      </ReactFlowProvider>
+      {graph.initialEdges ? (
+        <ReactFlowProvider>
+          <LayoutFlow
+            initialEdges={graph.initialEdges as any}
+            initialNodes={graph.initialNodes as any}
+          />
+        </ReactFlowProvider>
+      ) : (
+        <></>
+      )}
     </main>
   );
 }

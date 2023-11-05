@@ -1,4 +1,5 @@
 import { Card, Form, List } from "@douyinfe/semi-ui";
+import { FieldType } from "@lark-base-open/js-sdk";
 import { Handle, Position } from "reactflow";
 
 export function KVList(props: any) {
@@ -10,7 +11,11 @@ export function KVList(props: any) {
       title={
         <h1>
           {!props.data.start && (
-            <Handle type="target" position={Position.Left} />
+            <Handle
+              type="target"
+              position={Position.Left}
+              style={{ top: 30 }}
+            />
           )}
           {props.data.label}
         </h1>
@@ -19,21 +24,21 @@ export function KVList(props: any) {
       <Form
         labelPosition="left"
         labelAlign="right"
-        initValues={formatValues(props.data.data)}
+        // initValues={formatValues(props.data.data)}
       >
-        {props.data.data.map((item, i) => (
-          <div key={item.field}>
+        {props.data.fields.map((item, i) => (
+          <div key={item.id}>
             <Form.Input
-              field={item.field}
+              field={item.id}
               label={item.label}
-              initValue={item.value}
               readonly
               trigger="blur"
               style={{ width: 200 }}
             />
-            {item.type === "link" && (
+            {(item.type === FieldType.SingleLink ||
+              item.type === FieldType.DuplexLink) && (
               <Handle
-                id={item.field}
+                id={item.id}
                 type="source"
                 style={{ top: i * 56 + 52 + 29 }}
                 position={Position.Right}

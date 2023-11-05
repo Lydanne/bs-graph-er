@@ -73,9 +73,9 @@ export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
       onInit={onInit}
     >
       <Controls />
-      <MiniMap />
+      {/* <MiniMap /> */}
       <NodeToolbar />
-      <NodeResizer />
+      {/* <NodeResizer /> */}
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
     </ReactFlow>
   );
