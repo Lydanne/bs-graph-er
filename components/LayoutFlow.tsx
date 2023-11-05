@@ -33,7 +33,10 @@ export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
   const onLayout = useCallback(() => {
     const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
       nodes,
-      edges
+      edges,
+      {
+        direction: "LR",
+      }
     );
 
     setNodes([...layoutedNodes]);

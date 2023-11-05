@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@dagrejs/dagre':
+    specifier: ^1.0.4
+    version: registry.npmjs.org/@dagrejs/dagre@1.0.4
   '@douyinfe/semi-foundation':
     specifier: ^2.46.0
     version: registry.npmjs.org/@douyinfe/semi-foundation@2.46.0
@@ -23,6 +26,9 @@ dependencies:
   i18next:
     specifier: ^23.6.0
     version: registry.npmjs.org/i18next@23.6.0
+  mitt:
+    specifier: ^3.0.1
+    version: registry.npmjs.org/mitt@3.0.1
   next:
     specifier: ^14.0.1
     version: registry.npmjs.org/next@14.0.1(@babel/core@7.23.0)(react-dom@18.2.0)(react@18.2.0)
@@ -523,6 +529,21 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': registry.npmjs.org/@jridgewell/trace-mapping@0.3.9
     dev: true
+
+  registry.npmjs.org/@dagrejs/dagre@1.0.4:
+    resolution: {integrity: sha512-jrEore+HhW1yg1Rsd9H1PPMcoEOD4bVh0WCXc6GqzyzubnJj4GaWGg8ETOrskTd/3n/g5LOzumGM4CCgpNLJNw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@dagrejs/dagre/-/dagre-1.0.4.tgz}
+    name: '@dagrejs/dagre'
+    version: 1.0.4
+    dependencies:
+      '@dagrejs/graphlib': registry.npmjs.org/@dagrejs/graphlib@2.1.13
+    dev: false
+
+  registry.npmjs.org/@dagrejs/graphlib@2.1.13:
+    resolution: {integrity: sha512-calbMa7Gcyo+/t23XBaqQqon8LlgE9regey4UVoikoenKBXvUnCUL3s9RP6USCxttfr0XWVICtYUuKMdehKqMw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@dagrejs/graphlib/-/graphlib-2.1.13.tgz}
+    name: '@dagrejs/graphlib'
+    version: 2.1.13
+    engines: {node: '>17.0.0'}
+    dev: false
 
   registry.npmjs.org/@dnd-kit/accessibility@3.0.1(react@18.2.0):
     resolution: {integrity: sha512-HXRrwS9YUYQO9lFRc/49uO/VICbM+O+ZRpFDe9Pd1rwVv2PCNkRiTZRdxrDgng/UkvdC3Re9r2vwPpXXrWeFzg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/@dnd-kit/accessibility/-/accessibility-3.0.1.tgz}
@@ -4842,6 +4863,12 @@ packages:
     name: minimist
     version: 1.2.8
     dev: true
+
+  registry.npmjs.org/mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/mitt/-/mitt-3.0.1.tgz}
+    name: mitt
+    version: 3.0.1
+    dev: false
 
   registry.npmjs.org/ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/ms/-/ms-2.1.2.tgz}

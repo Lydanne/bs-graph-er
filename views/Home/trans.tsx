@@ -15,6 +15,7 @@ export function trans(tables = []) {
         end: i === tables.length - 1,
         label: table.label,
         fields: table.fields,
+        data: table.data,
       },
       // sourcePosition: "right",
       // targetPosition: "left",

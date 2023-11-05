@@ -6,20 +6,24 @@ import { Node, ReactFlowProvider } from "reactflow";
 import { LayoutFlow } from "@/components/LayoutFlow";
 import { trans } from "./trans";
 
-import { ITable, bitable } from "@lark-base-open/js-sdk";
+import { FieldType, ITable, bitable } from "@lark-base-open/js-sdk";
+import mitt from "mitt";
+
 const bs: { table?: ITable } = {};
 let pr: any;
+const emitter = mitt();
 const p = new Promise((resolve) => (pr = resolve));
 setTimeout(async () => {
-  // const table = await bitable.base.getActiveTable();
-  // bs.table = table;
+  const table = await bitable.base.getActiveTable();
+  bs.table = table;
   // const fieldList = await table.getFieldList();
-  const tableList = await bitable.base.getTableList();
-  pr(await bsTableTrans(tableList));
+  // const tableList = await bitable.base.getTableList();
+  // pr(await bsTableTrans(tableList));
   // console.log({ tableList }, ;
-  // bitable.base.onSelectionChange((e) => {
-  //   console.log(e);
-  // });
+  bitable.base.onSelectionChange(async (e) => {
+    emitter.emit("change-record", e);
+    // console.log(record);
+  });
 });
 
 async function bsTableTrans(bsTableList: ITable[]) {
@@ -44,131 +48,148 @@ async function bsTableTrans(bsTableList: ITable[]) {
         property: item.property,
         meta: item,
       })),
-      data: [],
+      data: fields.map((item) => ({
+        field: item.id,
+        value: FieldType[item.type],
+      })),
     });
   }
 
   return tables;
 }
 
-const tables = [
-  {
-    id: "1",
-    label: "表1",
-    primary: "field1",
-    fields: [
-      {
-        id: "field1",
-        label: "字段1",
-        type: "string",
-      },
-      {
-        id: "field2",
-        label: "字段2",
-        type: "link",
-      },
-      {
-        id: "field3",
-        label: "字段2",
-        type: "link",
-      },
-    ],
-    data: [
-      {
-        id: "field1",
-        value: "1",
-      },
-      {
-        id: "field2",
-        value: ["2"],
-      },
-      {
-        id: "field3",
-        value: ["3"],
-      },
-    ],
-  },
-  {
-    id: "2",
-    label: "表2",
-    primary: "field1",
-    fields: [
-      {
-        id: "field1",
-        label: "字段1",
-        type: "link",
-      },
-      {
-        id: "field2",
-        label: "字段2",
-        type: "string",
-      },
-    ],
-    data: [
-      {
-        id: "field1",
-        value: ["3"],
-      },
-      {
-        id: "field2",
-        value: "2",
-      },
-    ],
-  },
-  {
-    id: "3",
-    label: "表3",
-    primary: "field1",
-    fields: [
-      {
-        id: "field1",
-        label: "field1",
-        type: "string",
-      },
-      {
-        id: "field2",
-        label: "field2",
-        type: "string",
-      },
-      {
-        id: "field3",
-        label: "field3",
-        type: "link",
-      },
-    ],
-    data: [
-      {
-        id: "field1",
-        value: "1",
-      },
-      {
-        id: "field2",
-        value: "3",
-      },
-      {
-        id: "field3",
-        value: ["1"],
-      },
-    ],
-  },
-];
+async function deepGet(recordId: any, tableId: any, dep = {}) {
+  if (dep[recordId + tableId]) {
+    return dep[recordId + tableId];
+  }
+  const table = await bitable.base.getTable(tableId);
+  const fields = await table.getFieldMetaList();
+  const record = await table.getRecordById(recordId);
+  const result = {
+    id: tableId,
+    recordId,
+    label: await table.getName(),
+    fields: fields.map((item) => ({
+      id: item.id,
+      label: item.name,
+      type: item.type,
+      property: item.property,
+      meta: item,
+    })),
+    data: [],
+  };
+
+  dep[recordId + tableId] = result;
+
+  result.data = await Promise.all(
+    fields.map(async (item) => {
+      const value = record.fields[item.id];
+      return {
+        field: item.id,
+        value:
+          item.type === FieldType.SingleLink ||
+          item.type === FieldType.DuplexLink
+            ? await Promise.all(
+                value?.recordIds.map((rid) =>
+                  deepGet(rid, value.tableId, dep)
+                ) ?? []
+              )
+            : value,
+      };
+    })
+  );
+
+  return result;
+}
+
+/**
+ * deep table => [nodes, edges]
+ * @param table deepGet() return
+ */
+function deepTrans(
+  table: any,
+  nodes: any = [],
+  edges: any = [],
+  nodeDep: any = {},
+  edgeDep: any = {}
+) {
+  const node = {
+    id: table.recordId,
+    type: "kvlist",
+    position: { x: 0, y: 0 },
+    data: {
+      start: false,
+      end: false,
+      label: table.label,
+      fields: table.fields,
+      data: table.data,
+    },
+  };
+  if (!nodeDep[node.id]) {
+    nodes.push(node);
+    nodeDep[node.id] = true;
+  }
+
+  for (let i = 0; i < table.fields.length; i++) {
+    const field = table.fields[i];
+    if (
+      field.type !== FieldType.SingleLink &&
+      field.type !== FieldType.DuplexLink
+    )
+      continue;
+    const value = table.data[i].value;
+    for (let i = 0; i < value.length; i++) {
+      const v = value[i];
+      const eid = table.recordId + "-" + v.recordId;
+      if (edgeDep[eid]) continue;
+      edgeDep[eid] = true;
+      edges.push({
+        id: eid,
+        sourceHandle: field.id,
+        source: table.recordId,
+        target: v.recordId,
+      } as any);
+      deepTrans(v, nodes, edges, nodeDep, edgeDep);
+    }
+  }
+
+  return [nodes, edges];
+}
+
 let t = false;
 export default function Home() {
   const [graph, setGraph] = useState<any>({});
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    if (t) return;
-    t = true;
-    p.then((tables) => {
-      console.log({ tables });
+    // if (t) return;
+    // t = true;
+    // p.then((tables) => {
+    //   console.log({ tables });
 
-      const [initialNodes, initialEdges] = trans(tables);
-      console.log({ initialNodes, initialEdges });
-      setGraph({ initialNodes, initialEdges });
+    //   const [initialNodes, initialEdges] = trans(tables);
+    //   console.log({ initialNodes, initialEdges });
+    //   setGraph({ initialNodes, initialEdges });
+    // });
+    emitter.on("change-record", async (e: any) => {
+      // const tables = await p;
+
+      // console.log(tables);
+      setLoading(true);
+      console.log(e);
+      const t = await deepGet(e.data.recordId, e.data.tableId);
+      console.log(t);
+      const g = deepTrans(t);
+      console.log(g);
+      setGraph({ initialNodes: g[0], initialEdges: g[1] });
+      setLoading(false);
     });
+    return () => {
+      emitter.off("change-record");
+    };
   });
   return (
     <main className={styles.main} style={{ width: "100vw", height: "100vh" }}>
-      {graph.initialEdges ? (
+      {!loading ? (
         <ReactFlowProvider>
           <LayoutFlow
             initialEdges={graph.initialEdges as any}

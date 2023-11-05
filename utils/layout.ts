@@ -1,34 +1,47 @@
-import { stratify, tree } from "d3-hierarchy";
+import Dagre from "@dagrejs/dagre";
 
-const g = tree();
+const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
-export const getLayoutedElements = (nodes: string | any[], edges: any[]) => {
-  if (nodes.length === 0) return { nodes, edges };
+export const getLayoutedElements = (
+  nodes: any[],
+  edges: any[],
+  options: { direction: any }
+) => {
+  g.setGraph({
+    rankdir: options.direction,
+  });
 
-  const { width, height } = document
-    .querySelector(`[data-id="${nodes[0].id}"]`)
-    .getBoundingClientRect();
-  const hierarchy = stratify()
-    .id((node: { id: any }) => node.id)
-    .parentId(
-      (node: { id: any }) =>
-        edges.find((edge) => edge.target === node.id)?.source
-    );
-  const root = hierarchy(nodes);
+  const els = document.querySelectorAll(".kvlist-node");
 
-  // 增加水平和垂直间距
-  const horizontalSpacing = 100; // 调整水平间距
-  const verticalSpacing = 50; // 调整垂直间距
-  const layout = g.size([
-    height * 2 + verticalSpacing,
-    width * 2 + horizontalSpacing,
-  ])(root);
+  const elMap = Array.from(els).reduce((acc, el) => {
+    const id = el.id;
+
+    return { ...acc, [id]: el.clientHeight };
+  }, {});
+
+  console.log(elMap);
+
+  edges.forEach(
+    (edge: {
+      source: Dagre.Edge;
+      target: string | { [key: string]: any } | undefined;
+    }) => g.setEdge(edge.source, edge.target)
+  );
+  nodes.forEach((node: string | Dagre.Label) =>
+    g.setNode(
+      node.id,
+      Object.assign(node, { width: 400, height: elMap[node.id] })
+    )
+  );
+
+  Dagre.layout(g);
 
   return {
-    nodes: layout.descendants().map((node: { data: any; x: any; y: any }) => ({
-      ...node.data,
-      position: { x: node.y, y: node.x },
-    })),
+    nodes: nodes.map((node: { id: string | Dagre.Label }) => {
+      const { x, y } = g.node(node.id);
+
+      return { ...node, position: { x, y } };
+    }),
     edges,
   };
 };
