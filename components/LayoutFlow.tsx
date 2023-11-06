@@ -39,7 +39,7 @@ export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
       }
     );
 
-    setNodes([...layoutedNodes]);
+    setNodes([...(layoutedNodes as any)]);
     setEdges([...layoutedEdges]);
 
     window.requestAnimationFrame(() => {
@@ -47,7 +47,10 @@ export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
     });
   }, [nodes, edges]);
 
-  useEffect(() => {});
+  // useEffect(() => {
+  //   setEdges(initialEdges);
+  //   setNodes(initialNodes);
+  // }, [initialNodes, initialEdges, setEdges, setNodes]);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds: any) => addEdge(params, eds)),

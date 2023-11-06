@@ -1,4 +1,4 @@
-import { Button, Toast } from "@douyinfe/semi-ui";
+import { Button, Empty, Spin, Toast } from "@douyinfe/semi-ui";
 import { useState, useEffect, useRef, useCallback } from "react";
 import styles from "./index.module.css";
 import { useTranslation } from "next-i18next";
@@ -8,6 +8,10 @@ import { trans } from "./trans";
 
 import { FieldType, ITable, bitable } from "@lark-base-open/js-sdk";
 import mitt from "mitt";
+import {
+  IllustrationNoResult,
+  IllustrationNoResultDark,
+} from "@douyinfe/semi-illustrations";
 
 const bs: { table?: ITable } = {};
 let pr: any;
@@ -58,14 +62,14 @@ async function bsTableTrans(bsTableList: ITable[]) {
   return tables;
 }
 
-async function deepGet(recordId: any, tableId: any, dep = {}) {
+async function deepGet(recordId: any, tableId: any, dep: any = {}) {
   if (dep[recordId + tableId]) {
     return dep[recordId + tableId];
   }
   const table = await bitable.base.getTable(tableId);
   const fields = await table.getFieldMetaList();
   const record = await table.getRecordById(recordId);
-  const result = {
+  const result: any = {
     id: tableId,
     recordId,
     label: await table.getName(),
@@ -83,14 +87,14 @@ async function deepGet(recordId: any, tableId: any, dep = {}) {
 
   result.data = await Promise.all(
     fields.map(async (item) => {
-      const value = record.fields[item.id];
+      const value = record.fields[item.id] as any;
       return {
         field: item.id,
         value:
           item.type === FieldType.SingleLink ||
           item.type === FieldType.DuplexLink
             ? await Promise.all(
-                value?.recordIds.map((rid) =>
+                value?.recordIds.map((rid: any) =>
                   deepGet(rid, value.tableId, dep)
                 ) ?? []
               )
@@ -156,10 +160,11 @@ function deepTrans(
   return [nodes, edges];
 }
 
-let t = false;
 export default function Home() {
+  const [t] = useTranslation();
   const [graph, setGraph] = useState<any>({});
   const [loading, setLoading] = useState(true);
+  const [select, setSelect] = useState(false);
   useEffect(() => {
     // if (t) return;
     // t = true;
@@ -174,6 +179,7 @@ export default function Home() {
       // const tables = await p;
 
       // console.log(tables);
+      setSelect(true);
       setLoading(true);
       console.log(e);
       const t = await deepGet(e.data.recordId, e.data.tableId);
@@ -188,8 +194,25 @@ export default function Home() {
     };
   });
   return (
-    <main className={styles.main} style={{ width: "100vw", height: "100vh" }}>
-      {!loading ? (
+    <main
+      className={styles.main}
+      style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      {!select ? (
+        <Empty
+          image={<IllustrationNoResult style={{ width: 150, height: 150 }} />}
+          darkModeImage={
+            <IllustrationNoResultDark style={{ width: 150, height: 150 }} />
+          }
+          description={t("empty-tip")}
+        />
+      ) : !loading ? (
         <ReactFlowProvider>
           <LayoutFlow
             initialEdges={graph.initialEdges as any}
@@ -197,7 +220,9 @@ export default function Home() {
           />
         </ReactFlowProvider>
       ) : (
-        <></>
+        <div>
+          <Spin size="large"></Spin>
+        </div>
       )}
     </main>
   );

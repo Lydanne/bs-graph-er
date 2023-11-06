@@ -14,6 +14,9 @@ dependencies:
   '@douyinfe/semi-icons':
     specifier: ^2.46.0
     version: registry.npmjs.org/@douyinfe/semi-icons@2.46.0(react@18.2.0)
+  '@douyinfe/semi-illustrations':
+    specifier: ^2.46.0
+    version: registry.npmjs.org/@douyinfe/semi-illustrations@2.46.0(react@18.2.0)
   '@douyinfe/semi-ui':
     specifier: ^2.46.0
     version: registry.npmjs.org/@douyinfe/semi-ui@2.46.0(react-dom@18.2.0)(react@18.2.0)
