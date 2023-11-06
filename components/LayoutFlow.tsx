@@ -6,6 +6,7 @@ import { useTranslation } from "next-i18next";
 import ReactFlow, {
   Background,
   BackgroundVariant,
+  ControlButton,
   Controls,
   MiniMap,
   NodeResizer,
@@ -20,12 +21,17 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { getLayoutedElements } from "@/utils/layout";
 import { KVList } from "./KVList";
+import { IconExpand } from "@douyinfe/semi-icons";
 
 const nodeTypes = {
   kvlist: KVList,
 };
 
-export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
+export const LayoutFlow = ({
+  initialNodes = [],
+  initialEdges = [],
+  fullscreen = false,
+}) => {
   const { fitView } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -67,6 +73,17 @@ export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
     [onLayout]
   );
 
+  const expand = useCallback(() => {
+    const nw = open("/", "_block");
+    if (nw) {
+      (nw as any).options = () => ({
+        initialEdges,
+        initialNodes,
+        fullscreen: true,
+      });
+    }
+  }, [initialEdges, initialNodes]);
+
   return (
     <ReactFlow
       nodeTypes={nodeTypes}
@@ -78,8 +95,14 @@ export const LayoutFlow = ({ initialNodes = [], initialEdges = [] }) => {
       onConnect={onConnect}
       onInit={onInit}
     >
-      <Controls />
-      {/* <MiniMap /> */}
+      <Controls>
+        {!fullscreen && (
+          <ControlButton onClick={() => expand()}>
+            <IconExpand />
+          </ControlButton>
+        )}
+      </Controls>
+      {fullscreen && <MiniMap />}
       <NodeToolbar />
       {/* <NodeResizer /> */}
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />

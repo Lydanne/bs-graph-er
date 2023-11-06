@@ -13,22 +13,26 @@ import {
   IllustrationNoResultDark,
 } from "@douyinfe/semi-illustrations";
 
-const bs: { table?: ITable } = {};
-let pr: any;
+const options = ((window as any)?.options?.() as any) || {};
+
+// const bs: { table?: ITable } = {};
+// let pr: any;
 const emitter = mitt();
-const p = new Promise((resolve) => (pr = resolve));
-setTimeout(async () => {
-  const table = await bitable.base.getActiveTable();
-  bs.table = table;
-  // const fieldList = await table.getFieldList();
-  // const tableList = await bitable.base.getTableList();
-  // pr(await bsTableTrans(tableList));
-  // console.log({ tableList }, ;
+// const p = new Promise((resolve) => (pr = resolve));
+// setTimeout(async () => {
+//   const table = await bitable.base.getActiveTable();
+//   bs.table = table;
+//   // const fieldList = await table.getFieldList();
+//   // const tableList = await bitable.base.getTableList();
+//   // pr(await bsTableTrans(tableList));
+//   // console.log({ tableList }, ;
+// });
+if (!options.fullscreen) {
   bitable.base.onSelectionChange(async (e) => {
     emitter.emit("change-record", e);
     // console.log(record);
   });
-});
+}
 
 async function bsTableTrans(bsTableList: ITable[]) {
   const tables = [];
@@ -175,6 +179,13 @@ export default function Home() {
     //   console.log({ initialNodes, initialEdges });
     //   setGraph({ initialNodes, initialEdges });
     // });
+    if (options.fullscreen) {
+      setSelect(true);
+      setLoading(true);
+      setGraph(options);
+      setLoading(false);
+      return;
+    }
     emitter.on("change-record", async (e: any) => {
       // const tables = await p;
 
@@ -214,10 +225,7 @@ export default function Home() {
         />
       ) : !loading ? (
         <ReactFlowProvider>
-          <LayoutFlow
-            initialEdges={graph.initialEdges as any}
-            initialNodes={graph.initialNodes as any}
-          />
+          <LayoutFlow {...graph} />
         </ReactFlowProvider>
       ) : (
         <div>
