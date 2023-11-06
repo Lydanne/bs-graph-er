@@ -5,7 +5,7 @@ export function trans(tables = []) {
   const edges = [];
   let isLoop = false;
   for (let i = 0; i < tables.length; i++) {
-    const table = tables[i];
+    const table = tables[i] as any;
     const node = {
       id: table.id,
       type: "kvlist",

@@ -30,7 +30,7 @@ export function KVList(props: any) {
             e.stopPropagation();
           }}
         >
-          {props.data.fields.map((item, i) => {
+          {props.data.fields.map((item: any, i: number) => {
             return (
               <div key={item.id}>
                 {mapCb(
@@ -43,7 +43,7 @@ export function KVList(props: any) {
                         style={{ width: 200 }}
                         clickToHide
                       >
-                        {item.property.options.map((item) => (
+                        {item.property.options.map((item: any) => (
                           <Form.Select.Option key={item.id} value={item.id}>
                             {item.name}
                           </Form.Select.Option>
@@ -99,7 +99,7 @@ function formatValues(data: any[], fields: any[] = []) {
     if (field.type === FieldType.Text) {
       acc[c.field] = c.value?.[0]?.text;
     } else if (field.type === FieldType.MultiSelect) {
-      acc[c.field] = c.value?.map((item) => item.id) ?? [];
+      acc[c.field] = c.value?.map((item: any) => item.id) ?? [];
     } else if (field.type === FieldType.DateTime) {
       acc[c.field] = c.value;
     } else {

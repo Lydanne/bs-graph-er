@@ -13,13 +13,11 @@ export const getLayoutedElements = (
 
   const els = document.querySelectorAll(".kvlist-node");
 
-  const elMap = Array.from(els).reduce((acc, el) => {
+  const elMap: any = Array.from(els).reduce((acc, el) => {
     const id = el.id;
 
     return { ...acc, [id]: el.clientHeight };
   }, {});
-
-  console.log(elMap);
 
   edges.forEach(
     (edge: {
@@ -27,7 +25,7 @@ export const getLayoutedElements = (
       target: string | { [key: string]: any } | undefined;
     }) => g.setEdge(edge.source, edge.target)
   );
-  nodes.forEach((node: string | Dagre.Label) =>
+  nodes.forEach((node: any) =>
     g.setNode(
       node.id,
       Object.assign(node, { width: 400, height: elMap[node.id] })
