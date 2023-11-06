@@ -94,6 +94,7 @@ export const LayoutFlow = ({
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       onInit={onInit}
+      minZoom={0.1}
     >
       <Controls>
         {!fullscreen && (
