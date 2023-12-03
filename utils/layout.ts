@@ -28,7 +28,7 @@ export const getLayoutedElements = (
   nodes.forEach((node: any) =>
     g.setNode(
       node.id,
-      Object.assign(node, { width: 400, height: elMap[node.id] })
+      Object.assign(node, { width: 400, height: elMap[node.id] || 100 })
     )
   );
 

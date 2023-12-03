@@ -45,6 +45,8 @@ export const LayoutFlow = ({
       }
     );
 
+    console.log(layoutedNodes, layoutedEdges);
+
     setNodes([...(layoutedNodes as any)]);
     setEdges([...layoutedEdges]);
 
@@ -52,11 +54,6 @@ export const LayoutFlow = ({
       fitView();
     });
   }, [nodes, edges]);
-
-  // useEffect(() => {
-  //   setEdges(initialEdges);
-  //   setNodes(initialNodes);
-  // }, [initialNodes, initialEdges, setEdges, setNodes]);
 
   const onConnect = useCallback(
     (params: any) => setEdges((eds: any) => addEdge(params, eds)),

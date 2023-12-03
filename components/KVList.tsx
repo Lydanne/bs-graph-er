@@ -25,7 +25,7 @@ export function KVList(props: any) {
         <Form
           labelPosition="left"
           labelAlign="right"
-          initValues={formatValues(props.data.data, props.data.fields)}
+          initValues={formatValues(props.data.data)}
           onClickCapture={(e) => {
             e.stopPropagation();
           }}
@@ -33,43 +33,13 @@ export function KVList(props: any) {
           {props.data.fields.map((item: any, i: number) => {
             return (
               <div key={item.id}>
-                {mapCb(
-                  {
-                    [FieldType.MultiSelect]: () => (
-                      <Form.Select
-                        field={item.id}
-                        label={item.label}
-                        multiple
-                        style={{ width: 200 }}
-                        clickToHide
-                      >
-                        {item.property.options.map((item: any) => (
-                          <Form.Select.Option key={item.id} value={item.id}>
-                            {item.name}
-                          </Form.Select.Option>
-                        ))}
-                      </Form.Select>
-                    ),
-                    [FieldType.DateTime]: () => (
-                      <Form.DatePicker
-                        field={item.id}
-                        label={item.label}
-                        type="dateTime"
-                        format={item.property.dateFormat}
-                      />
-                    ),
-                  },
-                  item.type,
-                  () => (
-                    <Form.Input
-                      field={item.id}
-                      label={item.label}
-                      readonly
-                      trigger="blur"
-                      style={{ width: 200 }}
-                    />
-                  )
-                )}
+                <Form.Input
+                  field={item.id}
+                  label={item.label}
+                  readonly
+                  trigger="blur"
+                  style={{ width: 200 }}
+                />
                 {(item.type === FieldType.SingleLink ||
                   item.type === FieldType.DuplexLink) && (
                   <Handle
@@ -92,29 +62,30 @@ function mapCb(map: any, key: string, cb: any) {
   return map?.[key]?.() ?? cb();
 }
 
-function formatValues(data: any[], fields: any[] = []) {
-  const fieldMap = formatFieldsMap(fields);
+function formatValues(data: any[] = []) {
+  // const fieldMap = formatFieldsMap(fields);
   const r = data.reduce((acc, c) => {
-    const field = fieldMap[c.field];
-    if (field.type === FieldType.Text) {
-      acc[c.field] = c.value?.[0]?.text;
-    } else if (field.type === FieldType.MultiSelect) {
-      acc[c.field] = c.value?.map((item: any) => item.id) ?? [];
-    } else if (field.type === FieldType.DateTime) {
-      acc[c.field] = c.value;
-    } else {
-      const cell = c.value;
-      acc[c.field] =
-        typeof c === "object"
-          ? cell?.text ??
-            cell
-              ?.map?.((item: any) => item.text ?? item.name ?? item.label)
-              .join(",")
-          : cell;
-    }
+    // const field = fieldMap[c.field];
+    // if (field.type === FieldType.Text) {
+    //   acc[c.field] = c.value?.[0]?.text;
+    // } else if (field.type === FieldType.MultiSelect) {
+    //   acc[c.field] = c.value?.map((item: any) => item.id) ?? [];
+    // } else if (field.type === FieldType.DateTime) {
+    //   acc[c.field] = c.value;
+    // } else {
+    //   const cell = c.value;
+    //   acc[c.field] =
+    //     typeof c === "object"
+    //       ? cell?.text ??
+    //         cell
+    //           ?.map?.((item: any) => item.text ?? item.name ?? item.label)
+    //           .join(",")
+    //       : cell;
+    // }
+    acc[c.field] = c.value;
     return acc;
   }, {});
-  console.log({ r });
+  // console.log({ r });
 
   return r;
 }

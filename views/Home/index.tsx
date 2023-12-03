@@ -16,17 +16,16 @@ import {
 const options = ((window as any)?.options?.() as any) || {};
 
 // const bs: { table?: ITable } = {};
-// let pr: any;
 const emitter = mitt();
-// const p = new Promise((resolve) => (pr = resolve));
-// setTimeout(async () => {
-//   const table = await bitable.base.getActiveTable();
-//   bs.table = table;
-//   // const fieldList = await table.getFieldList();
-//   // const tableList = await bitable.base.getTableList();
-//   // pr(await bsTableTrans(tableList));
-//   // console.log({ tableList }, ;
-// });
+
+async function fetchTables() {
+  // const table = await bitable.base.getActiveTable();
+  // bs.table = table;
+  // const fieldList = await table.getFieldList();
+  const tableList = await bitable.base.getTableList();
+  return await bsTableTrans(tableList);
+}
+
 if (!options.fullscreen) {
   bitable.base.onSelectionChange(async (e) => {
     emitter.emit("change-record", e);
@@ -168,17 +167,9 @@ export default function Home() {
   const [t] = useTranslation();
   const [graph, setGraph] = useState<any>({});
   const [loading, setLoading] = useState(true);
-  const [select, setSelect] = useState(false);
+  const [deno, setDeno] = useState(false);
+  const [select, setSelect] = useState(true);
   useEffect(() => {
-    // if (t) return;
-    // t = true;
-    // p.then((tables) => {
-    //   console.log({ tables });
-
-    //   const [initialNodes, initialEdges] = trans(tables);
-    //   console.log({ initialNodes, initialEdges });
-    //   setGraph({ initialNodes, initialEdges });
-    // });
     if (options.fullscreen) {
       setSelect(true);
       setLoading(true);
@@ -186,24 +177,37 @@ export default function Home() {
       setLoading(false);
       return;
     }
-    emitter.on("change-record", async (e: any) => {
-      // const tables = await p;
-
-      // console.log(tables);
-      setSelect(true);
+    fetchTables().then((tables) => {
       setLoading(true);
-      console.log(e);
-      const t = await deepGet(e.data.recordId, e.data.tableId);
-      console.log(t);
-      const g = deepTrans(t);
-      console.log(g);
-      setGraph({ initialNodes: g[0], initialEdges: g[1] });
-      setLoading(false);
+      setDeno(false);
+      console.log({ tables });
+      const [initialNodes, initialEdges] = trans(tables as any);
+      console.log({ initialNodes, initialEdges });
+      setGraph({ initialNodes, initialEdges });
+      setDeno(true);
+      setTimeout(() => {
+        setLoading(false);
+      }, 100);
     });
+
+    // emitter.on("change-record", async (e: any) => {
+    //   // const tables = await p;
+
+    //   // console.log(tables);
+    //   setSelect(true);
+    //   setLoading(true);
+    //   console.log(e);
+    //   const t = await deepGet(e.data.recordId, e.data.tableId);
+    //   console.log(t);
+    //   const g = deepTrans(t);
+    //   console.log(g);
+    //   setGraph({ initialNodes: g[0], initialEdges: g[1] });
+    //   setLoading(false);
+    // });
     return () => {
-      emitter.off("change-record");
+      // emitter.off("change-record");
     };
-  });
+  }, []);
   return (
     <main
       className={styles.main}
@@ -223,12 +227,28 @@ export default function Home() {
           }
           description={t("empty-tip")}
         />
-      ) : !loading ? (
-        <ReactFlowProvider>
-          <LayoutFlow {...graph} />
-        </ReactFlowProvider>
       ) : (
-        <div>
+        deno && (
+          <ReactFlowProvider>
+            <LayoutFlow {...graph} />
+          </ReactFlowProvider>
+        )
+      )}
+      {loading && (
+        <div
+          style={{
+            width: "100%",
+            height: "100vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "#fff",
+            position: "fixed",
+            top: 0,
+            left: 0,
+            zIndex: 100,
+          }}
+        >
           <Spin size="large"></Spin>
         </div>
       )}

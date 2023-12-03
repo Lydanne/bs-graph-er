@@ -57,6 +57,7 @@ export function trans(tables = []) {
       id: "root-ref",
       type: "output",
       position: { x: 0, y: 0 },
+      height: 200,
       data: { label: `Ref<${nodes[0].data.label}>` },
       targetPosition: "left",
     });
