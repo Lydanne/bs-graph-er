@@ -175,6 +175,8 @@ export default function Home() {
       setLoading(true);
       setGraph(options);
       setLoading(false);
+      setDeno(true);
+
       return;
     }
     fetchTables().then((tables) => {
