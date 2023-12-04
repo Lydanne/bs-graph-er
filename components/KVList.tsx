@@ -1,8 +1,20 @@
-import { Card, Form, List, Select } from "@douyinfe/semi-ui";
+import { IconDoubleChevronRight } from "@douyinfe/semi-icons";
+import {
+  Button,
+  Card,
+  Descriptions,
+  Form,
+  List,
+  Popover,
+  Select,
+} from "@douyinfe/semi-ui";
 import { FieldType } from "@lark-base-open/js-sdk";
+import { useState } from "react";
 import { Handle, Position } from "reactflow";
 
 export function KVList(props: any) {
+  const [visible, setVisible] = useState(false);
+  const mapVal = formatValues(props.data.data);
   return (
     <div className="kvlist-node" id={props.id}>
       <Card
@@ -16,40 +28,81 @@ export function KVList(props: any) {
               position={Position.Left}
               style={{ top: 30 }}
             />
-            {props.data.label}
+            <Popover
+              visible={visible}
+              showArrow
+              arrowPointAtCenter
+              rePosKey={Date.now()}
+              clickToHide
+              closeOnEsc
+              content={
+                <Descriptions
+                  size="small"
+                  data={props.data.fields.map((item: any) => ({
+                    key: item.label,
+                    value: mapVal[item.id],
+                  }))}
+                />
+              }
+              trigger="custom"
+              position={"rightTop"}
+              spacing={10}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span>{props.data.label}</span>
+                <Button
+                  style={{ marginLeft: "10px" }}
+                  size="small"
+                  icon={<IconDoubleChevronRight />}
+                  onClick={() => setVisible(!visible)}
+                ></Button>
+              </div>
+            </Popover>
           </h1>
         }
       >
         <Form
           labelPosition="left"
           labelAlign="right"
-          initValues={formatValues(props.data.data)}
+          initValues={mapVal}
           onClickCapture={(e) => {
             e.stopPropagation();
           }}
         >
-          {props.data.fields.map((item: any, i: number) => {
-            return (
-              <div key={item.id}>
-                <Form.Input
-                  field={item.id}
-                  label={item.label}
-                  readonly
-                  trigger="blur"
-                  style={{ width: 200 }}
-                />
-                {(item.type === FieldType.SingleLink ||
-                  item.type === FieldType.DuplexLink) && (
-                  <Handle
-                    id={item.id}
-                    type="source"
-                    style={{ top: i * 56 + 52 + 29 }}
-                    position={Position.Right}
+          {props.data.fields
+            .filter(
+              (item: any) =>
+                item.type === FieldType.SingleLink ||
+                item.type === FieldType.DuplexLink
+            )
+            .map((item: any, i: number) => {
+              return (
+                <div key={item.id}>
+                  <Form.Input
+                    field={item.id}
+                    label={item.label}
+                    readonly
+                    trigger="blur"
+                    style={{ width: 200 }}
                   />
-                )}
-              </div>
-            );
-          })}
+                  {(item.type === FieldType.SingleLink ||
+                    item.type === FieldType.DuplexLink) && (
+                    <Handle
+                      id={item.id}
+                      type="source"
+                      style={{ top: i * 56 + 52 + 29 }}
+                      position={Position.Right}
+                    />
+                  )}
+                </div>
+              );
+            })}
         </Form>
       </Card>
     </div>

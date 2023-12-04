@@ -80,7 +80,7 @@ export const LayoutFlow = ({
       });
     }
   }, [initialEdges, initialNodes]);
-
+  const onMoveEnd = useCallback(() => {}, [onLayout]);
   return (
     <ReactFlow
       nodeTypes={nodeTypes}
@@ -92,6 +92,7 @@ export const LayoutFlow = ({
       onConnect={onConnect}
       onInit={onInit}
       minZoom={0.1}
+      onMoveEnd={onMoveEnd}
     >
       <Controls>
         {!fullscreen && (
