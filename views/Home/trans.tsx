@@ -36,32 +36,32 @@ export function trans(tables = []) {
           source: table.id,
           target: id,
         };
-        if (nodes[0].id === edge.target) {
-          isLoop = true;
-          edges.push({
-            id: "root-ref-edge" + edge.id + "-" + edge.source,
-            sourceHandle: edge.sourceHandle,
-            source: edge.source,
-            target: "root-ref",
-          });
-        } else {
-          edges.push(edge);
-        }
+        // if (nodes[0].id === edge.target) {
+        //   isLoop = true;
+        //   edges.push({
+        //     id: "root-ref-edge" + edge.id + "-" + edge.source,
+        //     sourceHandle: edge.sourceHandle,
+        //     source: edge.source,
+        //     target: "root-ref",
+        //   });
+        // } else {
+        edges.push(edge);
+        // }
         // }
       }
     }
   }
 
-  if (isLoop) {
-    nodes.push({
-      id: "root-ref",
-      type: "output",
-      position: { x: 0, y: 0 },
-      height: 200,
-      data: { label: `Ref<${nodes[0].data.label}>` },
-      targetPosition: "left",
-    });
-  }
+  // if (isLoop) {
+  //   nodes.push({
+  //     id: "root-ref",
+  //     type: "output",
+  //     position: { x: 0, y: 0 },
+  //     height: 200,
+  //     data: { label: `Ref<${nodes[0].data.label}>` },
+  //     targetPosition: "left",
+  //   });
+  // }
 
   return [nodes, edges];
 }

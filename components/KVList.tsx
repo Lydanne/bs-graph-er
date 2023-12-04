@@ -11,13 +11,11 @@ export function KVList(props: any) {
         bodyStyle={{ paddingTop: 0, paddingBottom: 0 }}
         title={
           <h1>
-            {!props.data.start && (
-              <Handle
-                type="target"
-                position={Position.Left}
-                style={{ top: 30 }}
-              />
-            )}
+            <Handle
+              type="target"
+              position={Position.Left}
+              style={{ top: 30 }}
+            />
             {props.data.label}
           </h1>
         }
