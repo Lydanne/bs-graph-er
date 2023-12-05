@@ -1,4 +1,4 @@
-import { IconDoubleChevronRight } from "@douyinfe/semi-icons";
+import { IconClose, IconDoubleChevronRight } from "@douyinfe/semi-icons";
 import {
   Button,
   Card,
@@ -36,13 +36,16 @@ export function KVList(props: any) {
               clickToHide
               closeOnEsc
               content={
-                <Descriptions
-                  size="small"
-                  data={props.data.fields.map((item: any) => ({
-                    key: item.label,
-                    value: mapVal[item.id],
-                  }))}
-                />
+                <div>
+                  <IconClose size="small" color="#666" />
+                  <Descriptions
+                    size="small"
+                    data={props.data.fields.map((item: any) => ({
+                      key: item.label,
+                      value: mapVal[item.id],
+                    }))}
+                  />
+                </div>
               }
               trigger="custom"
               position={"rightTop"}
