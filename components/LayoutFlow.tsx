@@ -21,7 +21,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { getLayoutedElements } from "@/utils/layout";
 import { KVList } from "./KVList";
-import { IconExpand } from "@douyinfe/semi-icons";
+import { IconExpand, IconHelpCircle } from "@douyinfe/semi-icons";
 
 const nodeTypes = {
   kvlist: KVList,
@@ -100,6 +100,11 @@ export const LayoutFlow = ({
             <IconExpand />
           </ControlButton>
         )}
+        <ControlButton
+          onClick={() => open("https://zhuanlan.zhihu.com/p/670722277")}
+        >
+          <IconHelpCircle />
+        </ControlButton>
       </Controls>
       {fullscreen && <MiniMap />}
       <NodeToolbar />
