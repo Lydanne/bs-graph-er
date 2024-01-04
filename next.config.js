@@ -11,7 +11,7 @@ const nextConfig = {
   // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
   skipTrailingSlashRedirect: true,
 
-  distDir: 'release',
+  distDir: 'dist',
 
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
