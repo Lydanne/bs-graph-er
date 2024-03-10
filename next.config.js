@@ -4,14 +4,8 @@ const { i18n } = require("./next-i18next.config");
 const nextConfig = {
   // i18n,
   output: 'export',
-
-  // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
-  trailingSlash: true,
-
-  // Optional: Prevent automatic `/me` -> `/me/`, instead preserve `href`
-  skipTrailingSlashRedirect: true,
-
-  distDir: 'release',
+  distDir: 'dist',
+  assetPrefix: './',
 
   productionBrowserSourceMaps: true,
   reactStrictMode: true,
