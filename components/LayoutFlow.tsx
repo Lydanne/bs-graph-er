@@ -71,7 +71,7 @@ export const LayoutFlow = ({
   );
 
   const expand = useCallback(() => {
-    const nw = open("/", "_block");
+    const nw = open(".", "_block");
     if (nw) {
       (nw as any).options = () => ({
         initialEdges,
